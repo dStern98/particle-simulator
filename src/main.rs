@@ -13,7 +13,7 @@ use std::time::Duration;
 fn main() {
     let number_of_particles = utils::read_args();
     with_2d_graphics(move || {
-        let canvas = create_drawing_window("Particles Simulator");
+        let canvas = create_drawing_window("Particle Simulator");
 
         //Clear the canvas to set a background colour
         canvas.draw(|gc| {
@@ -41,7 +41,6 @@ fn main() {
             canvas.draw(|gc| {
                 gc.layer(LayerId(0));
                 gc.clear_layer();
-
                 gc.canvas_height(1000.0);
                 gc.center_region(0.0, 0.0, 1000.0, 1000.0);
 
@@ -56,7 +55,7 @@ fn main() {
                 }
             });
             // Wait for the next frame
-            thread::sleep(Duration::from_nanos(1_000_000_123 / 15));
+            thread::sleep(Duration::from_nanos(1_000_000_123 / 45));
         }
     })
 }

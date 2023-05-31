@@ -3,7 +3,7 @@ use rand::*;
 use std::env;
 use std::ops::{Add, Mul, Sub};
 
-const MAX_NUMBER_OF_PARTICLES: usize = 30;
+const MAX_NUMBER_OF_PARTICLES: usize = 45;
 
 pub fn read_args() -> usize {
     //! Reads the command line args, looking specifically
