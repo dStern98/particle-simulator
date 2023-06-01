@@ -65,7 +65,7 @@ impl Circle {
     }
 
     pub fn draw(&self, sprite_id: SpriteId, canvas: &DrawingTarget, color: Color) {
-        //As the name suggests, draw the circle.
+        //Draw the circle onto the canvas.
         canvas.draw(|gc| {
             gc.sprite(sprite_id);
             gc.clear_sprite();
@@ -108,6 +108,7 @@ impl Circle {
     }
 
     fn circle_distance(&self, other: &Circle) -> f64 {
+        //!Return the distance between two Circles centers.
         return f64::sqrt(
             (self.position_x - other.position_x).powi(2)
                 + (self.position_y - other.position_y).powi(2),

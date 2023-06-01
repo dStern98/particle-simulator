@@ -3,15 +3,15 @@ use rand::*;
 use std::env;
 use std::ops::{Add, Mul, Sub};
 
-const MAX_NUMBER_OF_PARTICLES: usize = 45;
+const MAX_NUMBER_OF_PARTICLES: usize = 52;
 
 pub fn read_args() -> usize {
     //! Reads the command line args, looking specifically
     //! for a passed in integer number of particles for the simulation
     let args: Vec<String> = env::args().collect();
     let particle_count = match args.get(1) {
-        Some(number) => number.parse().unwrap_or(15),
-        None => 15,
+        Some(number) => number.parse().unwrap_or(20),
+        None => 20,
     };
 
     //For safety, we will cap the user at a max number of particles

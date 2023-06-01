@@ -2,7 +2,7 @@ mod circle;
 mod sweep_prune;
 mod utils;
 use circle::Circle;
-use sweep_prune::{apply_collision_updates, filter_actual_collisions, sweep_and_prune};
+use sweep_prune::detect_and_apply_collisions;
 
 use flo_canvas::*;
 use flo_draw::*;
@@ -31,9 +31,7 @@ fn main() {
                 particle.update(1.0);
             }
 
-            let possible_collisions = sweep_and_prune(&mut particles);
-            let actual_collisions = filter_actual_collisions(&particles, &possible_collisions);
-            apply_collision_updates(&mut particles, actual_collisions);
+            detect_and_apply_collisions(&mut particles);
 
             // At this point, actual_collisions contains all of the index pairs of collisions
             // Now we just need to iterate one by one, and apply the collision updates

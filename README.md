@@ -7,16 +7,10 @@ This is a 2D graphics simulator of particles and their collisions. Rust crates `
 ---
 
 The sweep and prune algorithm was used for broad phase collision detection, with the x-axis being the specific axis where sweep and prune is applied. The `utils.rs` file
-contains a function `read_args()` for allowing command line setting of the number of particles in the simulation. For example, to initiate the simulation with 20 particles, run:
+contains a function `read_args()` for allowing command line setting of the number of particles in the simulation. For example, to initiate the simulation with 50 particles, run:
 
 ```
-cargo run -- 20
+cargo run -- 50
 ```
 
-or run the executable directly with the `-- 20 ` argument if using the compiled binary.
-
-## Todo
-
----
-
-The current program is single-threaded. I intend to implement multithreading at some point in the future to make the collision detection more efficient, and allow for more particles or a higher frame rate in the simulation.
+or run the executable directly with the `-- 50 ` argument if using the compiled binary.
