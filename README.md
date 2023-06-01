@@ -15,6 +15,8 @@ cargo run -- 50
 
 or run the executable directly with the `-- 50 ` argument if using the compiled binary.
 
-## Code Gif
+## 15-Second Gif of Simulation
+
+Below is a gif made from a 15-second screen recording of the code running with 50 particles.
 
 ![particle collisions gif](https://github.com/dStern98/particle-simulator/blob/main/Particle_Simulator_Rust_Video_AdobeExpress.gif)
