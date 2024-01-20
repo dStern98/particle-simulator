@@ -1,8 +1,8 @@
-use crate::circle::Circle;
-use crate::circle::RADIUS_UPPER_BOUND;
+use crate::particle::Particle;
+use crate::particle::RADIUS_UPPER_BOUND;
 use ordered_float::OrderedFloat;
 
-fn sweep_and_prune(particles: &mut [Circle]) -> Vec<(usize, usize)> {
+fn sweep_and_prune(particles: &mut [Particle]) -> Vec<(usize, usize)> {
     //!Apply the sweep_and_prune algorithm to check for potential collisions
     //! Sort all the particles along the x-axis, and then check for a potential overlap
     //! Returns tuple pairs of the positions of possible collisions
@@ -24,11 +24,11 @@ fn sweep_and_prune(particles: &mut [Circle]) -> Vec<(usize, usize)> {
             let particle_2 = particles.get(inner_counter).unwrap();
 
             // If the two particles overlap on the a axis, then there may be a collision to check
-            if particle_1.position_x + particle_1.radius > particle_2.position_x - particle_2.radius
+            if (particle_1.position_x + particle_1.radius
+                > particle_2.position_x - particle_2.radius)
+                && (Particle::check_pairwise_collision(particle_1, particle_2))
             {
-                if Circle::check_pairwise_collision(particle_1, particle_2) {
-                    confirmed_collisions.push((outer_counter, inner_counter));
-                }
+                confirmed_collisions.push((outer_counter, inner_counter));
             }
 
             //One important optimization is that if the farthest right point
@@ -47,10 +47,10 @@ fn sweep_and_prune(particles: &mut [Circle]) -> Vec<(usize, usize)> {
         outer_counter += 1;
     }
 
-    return confirmed_collisions;
+    confirmed_collisions
 }
 
-fn apply_collision_updates(particles: &mut [Circle], actual_collisions: Vec<(usize, usize)>) {
+fn apply_collision_updates(particles: &mut [Particle], actual_collisions: Vec<(usize, usize)>) {
     //!Due to borrowing rules, we take each particle mutably one at a time.
     //! There is a nightly method to mutably borrow multiple at a time, but that is not used
     //! here.
@@ -63,7 +63,7 @@ fn apply_collision_updates(particles: &mut [Circle], actual_collisions: Vec<(usi
         let particle_a = particles.get(*index_a).unwrap();
         let particle_b = particles.get(*index_b).unwrap();
         //Obtain the required updates to the two particles
-        let (update_a, update_b) = particle_a.collision_react(&particle_b);
+        let (update_a, update_b) = particle_a.collision_react(particle_b);
 
         // Now we can borrow mutably one at a time without issue.
         let particle_a = particles.get_mut(*index_a).unwrap();
@@ -76,7 +76,7 @@ fn apply_collision_updates(particles: &mut [Circle], actual_collisions: Vec<(usi
     }
 }
 
-pub fn detect_and_apply_collisions(particles: &mut Vec<Circle>) {
+pub fn detect_and_apply_collisions(particles: &mut [Particle]) {
     //! Applies sweep and prune algorithm to detect collisions.
     //! Then calculates new velocities for the collided pairs.
 
@@ -99,9 +99,9 @@ mod tests {
     fn test_sort() {
         // Test that radix sort does the job
         let mut t1 = vec![
-            Circle::new(1, 1.0, 1.0, 1.0, 1.0, 1.0),
-            Circle::new(1, 0.5, 0.5, 0.5, 0.5, 0.5),
-            Circle::new(1, 3.2, 3.2, 3.2, 3.2, 3.2),
+            Particle::new(1, 1.0, 1.0, 1.0, 1.0, 1.0),
+            Particle::new(1, 0.5, 0.5, 0.5, 0.5, 0.5),
+            Particle::new(1, 3.2, 3.2, 3.2, 3.2, 3.2),
         ];
         t1.sort_by_key(|particle| OrderedFloat(particle.position_x));
 

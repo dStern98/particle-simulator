@@ -1,6 +1,5 @@
 use super::utils::MathVec;
 use flo_canvas::*;
-use rand;
 use std::f64::consts::PI;
 
 const WIDTH: f64 = 1000.0;
@@ -9,7 +8,7 @@ const VELOCITY_UPPER_BOUND: f64 = 25.0;
 pub const RADIUS_UPPER_BOUND: f64 = 50.0;
 
 #[derive(Debug, Clone, Copy)]
-pub struct Circle {
+pub struct Particle {
     // Because id is used for SpriteId, great care must be taken
     // to ensure that id is unique amongst the particles, otherwise
     // the particles in the simulation will spontaneously swap places
@@ -25,7 +24,7 @@ pub struct Circle {
     pub velocity_y: f64,
 }
 
-impl Circle {
+impl Particle {
     #[allow(dead_code)]
     pub fn new(
         id: u64,
@@ -38,7 +37,7 @@ impl Circle {
         //mass is dependent on radius and therefore should not
         // be set independently
         let mass = radius.powi(2) * PI;
-        Circle {
+        Particle {
             id,
             radius,
             mass,
@@ -49,11 +48,11 @@ impl Circle {
         }
     }
     pub fn new_random() -> Self {
-        //Creates a Random particle whose
-        //velocity, and position are bounded by the constants
-        // WIDTH, HEIGHT, and VELOCITY_UPPER_BOUND
+        //!Creates a Random particle whose
+        //!velocity, and position are bounded by the constants
+        //! `WIDTH`, `HEIGHT`, and `VELOCITY_UPPER_BOUND`
         let random_radius = rand::random::<f64>() * RADIUS_UPPER_BOUND;
-        Circle {
+        Particle {
             id: (rand::random::<u64>()),
             radius: random_radius,
             mass: random_radius.powi(2) * PI,
@@ -65,29 +64,27 @@ impl Circle {
     }
 
     pub fn draw(&self, sprite_id: SpriteId, canvas: &DrawingTarget, color: Color) {
-        //Draw the circle onto the canvas.
+        //!Draw the circle onto the canvas.
         canvas.draw(|gc| {
             gc.sprite(sprite_id);
             gc.clear_sprite();
 
             gc.new_path();
-            gc.circle(0.0 as f32, 0.0 as f32, self.radius as f32);
+            gc.circle(0.0, 0.0, self.radius as f32);
             gc.fill_color(color);
             gc.fill();
         })
     }
 
-    pub fn particle_factory(count: usize) -> Vec<Circle> {
-        // Generate count randomly sized circles.
-        // All random values are bounded by the constants
-        // defined at the top of the file.
-        return (0..count)
-            .into_iter()
-            .map(|_| Circle::new_random())
-            .collect();
+    pub fn particle_factory(count: usize) -> Vec<Particle> {
+        //! Generate `count` randomly sized circles.
+        //`` All random values are bounded by the constants
+        //`` defined at the top of the file.
+        (0..count).map(|_| Particle::new_random()).collect()
     }
 
     pub fn update(&mut self, dt: f64) {
+        //! Update the positions and velocities of the particle.
         // First, update the position by applying the velocity times the dt
         self.position_x += self.velocity_x * dt;
         self.position_y += self.velocity_y * dt;
@@ -107,22 +104,18 @@ impl Circle {
         }
     }
 
-    fn circle_distance(&self, other: &Circle) -> f64 {
-        //!Return the distance between two Circles centers.
-        return f64::sqrt(
-            (self.position_x - other.position_x).powi(2)
-                + (self.position_y - other.position_y).powi(2),
-        );
-    }
-
-    pub fn check_pairwise_collision(&self, other: &Circle) -> bool {
+    pub fn check_pairwise_collision(&self, other: &Particle) -> bool {
         // Returns a boolean depending on whether or not a collision has occurred
         // For circles, if the distance is less than the sum of the radii,
         // then the circles must overlap
-        return self.circle_distance(other) < self.radius + other.radius;
+        let circle_distance = f64::sqrt(
+            (self.position_x - other.position_x).powi(2)
+                + (self.position_y - other.position_y).powi(2),
+        );
+        circle_distance < self.radius + other.radius
     }
 
-    pub fn collision_react(&self, other: &Circle) -> (MathVec, MathVec) {
+    pub fn collision_react(&self, other: &Particle) -> (MathVec, MathVec) {
         //! Given two particles that are determined to have collided,
         //! perform the physics calcs for an elastic collision.
         //! Returns a tuple of the new velocities for self and other.
@@ -158,7 +151,7 @@ impl Circle {
                 * (1.0 / ((x2 - x1).inner_product(&(x2 - x1))))
                 * (x2 - x1);
 
-        return (v_self_new, v_other_new);
+        (v_self_new, v_other_new)
     }
 }
 
@@ -169,7 +162,7 @@ mod tests {
     #[test]
     fn test_move_normal() {
         //First, test a normal particle not hitting a wall
-        let mut test_particle = Circle::new(1, 1.0, 1.0, 1.0, 2.5, 3.5);
+        let mut test_particle = Particle::new(1, 1.0, 1.0, 1.0, 2.5, 3.5);
 
         test_particle.update(1.0);
 
@@ -185,7 +178,7 @@ mod tests {
     fn test_move_past_boundary() {
         // This time velocity_y of -3.5 will cause the particle to go off
         // the map in the y direction during the next move
-        let mut test_particle = Circle::new(1, 1.0, 1.0, 1.0, 2.5, -3.5);
+        let mut test_particle = Particle::new(1, 1.0, 1.0, 1.0, 2.5, -3.5);
         test_particle.update(1.0);
         assert_eq!(test_particle.position_x, 3.5);
         assert_eq!(test_particle.position_y, -2.5);
@@ -200,13 +193,13 @@ mod tests {
     #[test]
     fn test_pairwise_collision_detection() {
         //These two particles are colliding
-        let p1 = Circle::new(1, 1.5, 1.0, 2.0, 2.5, -3.5);
-        let mut p2 = Circle::new(1, 1.0, 2.0, 1.0, 2.5, -3.5);
+        let p1 = Particle::new(1, 1.5, 1.0, 2.0, 2.5, -3.5);
+        let mut p2 = Particle::new(1, 1.0, 2.0, 1.0, 2.5, -3.5);
         assert!(p1.check_pairwise_collision(&mut p2));
 
         //These two particle are not colliding
-        let p3 = Circle::new(1, 1.5, 1.0, 2.0, 2.5, -3.5);
-        let mut p4 = Circle::new(1, 1.0, 4.0, 1.0, 2.5, -3.5);
+        let p3 = Particle::new(1, 1.5, 1.0, 2.0, 2.5, -3.5);
+        let mut p4 = Particle::new(1, 1.0, 4.0, 1.0, 2.5, -3.5);
         assert!(!p3.check_pairwise_collision(&mut p4));
     }
 }

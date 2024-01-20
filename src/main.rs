@@ -1,7 +1,7 @@
-mod circle;
+mod particle;
 mod sweep_prune;
 mod utils;
-use circle::Circle;
+use particle::Particle;
 use sweep_prune::detect_and_apply_collisions;
 
 use flo_canvas::*;
@@ -12,6 +12,10 @@ use std::time::Duration;
 
 fn main() {
     let number_of_particles = utils::read_args();
+    println!(
+        "Begginning particle simulation with {} particles",
+        number_of_particles
+    );
     with_2d_graphics(move || {
         let canvas = create_drawing_window("Particle Simulator");
 
@@ -20,7 +24,7 @@ fn main() {
             gc.clear_canvas(Color::Rgba(0.0, 0.0, 0.0, 1.0));
         });
 
-        let mut particles = Circle::particle_factory(number_of_particles);
+        let mut particles = Particle::particle_factory(number_of_particles);
 
         for particle in particles.iter() {
             particle.draw(SpriteId(particle.id), &canvas, utils::get_random_color())
